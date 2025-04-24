@@ -2,9 +2,11 @@ const express = require("express");
 
 const app=express();
 
-const PORT = 3000;
+const PORT = 4000;
 
 // Authentication Middleware
+
+app.use(express.json());
 app.use((req,res,next)=>{
   console.log("Authentication Middleware called");
   next();
@@ -40,22 +42,27 @@ app.get("/welcome",(req,res)=>{
 })
 
 
-app.get('/orders', (req, res) => {
-  res.send('Here is the list of all orders.');
+// Products
+app.get('/products', (req, res) => {
+  res.send('Here is the list of all products.');
 });
 
-app.post('/orders', (req, res) => {
-  res.send('A new order has been created.');
+app.post('/products', (req, res) => {
+  res.send('A new product has been added.');
 });
 
-app.get('/users', (req, res) => {
-  res.send('Here is the list of all users.');
+// Categories
+app.get('/categories', (req, res) => {
+  res.send('Here is the list of all categories.');
 });
 
-app.post('/users', (req, res) => {
-  res.send('A new user has been added.');
+app.post('/categories', (req, res) => {
+  res.send('A new category has been created.');
 });
 
+app.all('/*splat',(req,res)=>{
+  res.status(404).send("<h1>404 - Page Not Found</h1>");
+})
 
 app.listen(PORT, () => {
   console.log(`Server is up and running on port ${PORT}! Ready to handle requests.`);
