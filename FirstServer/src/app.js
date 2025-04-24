@@ -41,6 +41,13 @@ app.get("/welcome",(req,res)=>{
   res.send(`<h2>Welcome,${req.user}</h2>`)
 })
 
+app.use("/products",(req,res,next)=>{
+  console.log(req.method);
+  console.log(req.url);
+  
+  next();
+})
+
 
 // Products
 app.get('/products', (req, res) => {
