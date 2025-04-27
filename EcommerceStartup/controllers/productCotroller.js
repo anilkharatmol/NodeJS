@@ -7,7 +7,7 @@ const getProducts = (req,res)=>{
 }
 
 const postProducts = (req,res)=>{
-    res.send("Adding a new product")
+   res.json(req.body);
 }
 
 const getProductId = (req,res)=>{

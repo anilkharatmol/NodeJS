@@ -1,9 +1,13 @@
 const express = require("express");
-const userRouter = require("../routes/userRoutes")
-const productRouter = require("../routes/productRoutes")
-const cartRouter = require("../routes/cartRoutes")
+const userRouter = require("./routes/userRoutes")
+const productRouter = require("./routes/productRoutes")
+const cartRouter = require("./routes/cartRoutes")
 
 const app = express();
+
+app.use(express.json())
+
+app.use(express.static("public"))
 
 app.use("/users",userRouter);
 app.use("/products",productRouter);
