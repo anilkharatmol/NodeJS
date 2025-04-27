@@ -1,5 +1,9 @@
+const path = require("path");
+
+
+
 const getProducts = (req,res)=>{
-    res.send("fetching all products")
+    res.sendFile(path.join(__dirname,"..","views","product.html"))
 }
 
 const postProducts = (req,res)=>{
