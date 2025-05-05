@@ -1,16 +1,22 @@
-const express = require("express")
-const db = require("./utils/dbConnection")
-const studentRouter = require("./routes/studentsRoutes")
+const express = require("express");
+const db = require("./utils/dbConnection");
+const studentRouter = require("./routes/studentsRoutes");
 const app = express();
+
+const studentModel = require("./models/students")
 
 app.use(express.json());
 
-app.get("/",(req,res)=>{
-    res.send("Hello World!")
-})
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
 
-app.use("/students",studentRouter);
+app.use("/students", studentRouter);
 
-app.listen(3000,()=>{
-    console.log("Server is running on PORT 3000"); 
-})
+db.sync({ force: true })
+  .then(() => {
+    app.listen(3000, () => {
+      console.log("Server is running on PORT 3000");
+    });
+  })
+  .catch((e) => console.log(e));
