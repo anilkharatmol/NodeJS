@@ -12,6 +12,4 @@ router.put("/update/:id",studentController.updateEntry)
 
 router.delete("/delete/:id",studentController.deleteEntry)
 
-router.put("/update-varchar-length",studentController.updateVarchar)
-
 module.exports = router;

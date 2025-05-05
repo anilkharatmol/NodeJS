@@ -13,7 +13,7 @@ app.get("/", (req, res) => {
 
 app.use("/students", studentRouter);
 
-db.sync({ force: true })
+db.sync()
   .then(() => {
     app.listen(3000, () => {
       console.log("Server is running on PORT 3000");
