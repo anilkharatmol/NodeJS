@@ -3,7 +3,8 @@ const db = require("./utils/dbConnection")
 const studentRouter = require("./routes/studentsRoutes")
 const app = express();
 
-app.use(express.json())
+app.use(express.json());
+
 app.get("/",(req,res)=>{
     res.send("Hello World!")
 })

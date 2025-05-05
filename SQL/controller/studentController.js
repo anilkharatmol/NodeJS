@@ -1,5 +1,45 @@
 const db = require("../utils/dbConnection")
 
+const getEntries = (req,res)=>{
+
+    const getEntriesQuery = `Select * from students`
+
+    db.execute(getEntriesQuery,(err,result)=>{
+        if(err){
+            console.log(err.message);
+            res.status(500).send(err.message);
+            return;
+        }
+
+        console.log("Entries Fetched Successfully");
+        res.status(200).send(result);
+    })
+}
+
+const getEntryById = (req,res) =>{
+    const {id} = req.params;
+
+    const getEntryByIdQuery = `Select * from Students where id = ?`
+
+    db.execute(getEntryByIdQuery,[id],(err,result)=>{
+
+        if(err){
+            console.log(err.message);
+            res.status(404).send(err.message);
+            return;
+        }
+
+        if(result.length === 0){
+            res.status(404).send("Student not found")
+            return;
+        }
+        
+
+        console.log(`Entry with id ${id} fetched successfully`);
+        res.status(200).send(result);
+    })
+}
+
 const addEntries = (req,res) =>{
     const {email,name} = req.body;
     const insertQuery = `INSERT INTO Students (email,name) VALUES (?,?)`;
@@ -45,6 +85,8 @@ const deleteEntry = (req,res) =>{
     const deleteQuery = `Delete from Students where id =?`
 
     db.execute(deleteQuery,[id],(err,result)=>{
+
+
         if(err){
             console.log(err.message);
             res.status(404).send(err.message)       
@@ -79,6 +121,8 @@ const updateVarchar  =  (req, res) => {
   }
 
 module.exports ={
+    getEntries,
+    getEntryById,
      addEntries, 
      updateEntry,
      deleteEntry,
