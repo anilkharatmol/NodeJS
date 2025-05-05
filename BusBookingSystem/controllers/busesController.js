@@ -1,42 +1,44 @@
-const db = require("../utils/dbConnection");
+const Buses = require("../models/busesModel");
+const {Op} = require("sequelize")
 
-const addBus =(req,res)=>{
-
-    const {busNumber,totalSeats,availableSeats} = req.body;
-
-    const addBusQuery = `INSERT INTO Buses (busNumber,totalSeats,availableSeats) VALUES (?,?,?)`
-
-    db.execute(addBusQuery,[busNumber,totalSeats,availableSeats],err =>{
-        if(err){
-            console.log(err.message);
-            res.status(500).send(err.message);
-            db.end();
-            return;
-        }
-
-        console.log(`Bus with number ${busNumber} added successfully`);
-        res.status(200).send(`Bus with number ${busNumber} added successfully`);
+const addBus = async (req,res)=>{
+    try {
+        const {busNumber,totalSeats,availableSeats} = req.body;
+        const newBus = await Buses.create({
+            busNumber:busNumber,
+            totalSeats:totalSeats,
+            availableSeats:availableSeats
+        })
+        res.status(201).send(`Bus with number ${busNumber} added successfully`);
         
-    })
+    } catch (error) {
+        res.status(500).send("Unable to add bus entry");
+    }
+
 }
 
-const getBusesWithMoreThanSeats =(req,res)=>{
-    const {seats} = req.params;
+const getBusesWithMoreThanSeats =async(req,res)=>{
+    
+    try {
+        const {seats} = req.params;
+        const bus = await Buses.findAll({
+            where:{
+                availableSeats:  {
+                    [Op.gt] : Number(seats)
+                }
+            }
+        })
 
-    const getBusesWithMoreThanSeatsQuery = `Select * from buses where availableSeats > ${seats}`;
-
-    db.execute(getBusesWithMoreThanSeatsQuery,(err,result)=>{
-        if(err){
-            console.log(err.message);
-            res.status(500).send(err.message);
-            db.end();
-            return;
+        if(bus.length === 0){
+            res.status(404).send("Bus not found");
         }
-
-        console.log(`getBusesWithMoreThanSeats Query Fetched Successfully`);
+        console.log(`Bus Fetched Successfully`);
         
-        res.status(200).send(result);
-    })
+        res.status(200).send(bus);
+    } catch (error) {
+        res.status(404).send("Error occured");
+    }
+
 }
 
 module.exports ={addBus,getBusesWithMoreThanSeats}
