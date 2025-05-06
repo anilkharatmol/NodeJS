@@ -1,0 +1,141 @@
+<html>
+  <body>
+    <div>
+      <h4
+        style="
+          color: orange;
+          text-align: center;
+          font-family: Calibri;
+          font-size: large;
+        "
+      >
+        Book a call
+      </h4>
+      <p style="text-align: center">
+        Book a call slot and our representative will call you within 1 hr of
+        selected time.
+      </p>
+      <hr />
+      <form id="myform" action="#" style="margin-left: 420px">
+        <label for="name">Name:</label><br />
+        <input type="text" id="name" name="name" style="width: 400px" /><br />
+        <label for="email">Email:</label><br />
+        <input
+          type="email"
+          id="email"
+          name="email"
+          style="width: 400px"
+        /><br />
+        <label for="number">Phone:</label><br />
+        <input
+          type="number"
+          id="number"
+          name="number"
+          style="width: 400px"
+        /><br /><br />
+        <button
+          type="submit"
+          style="
+            color: white;
+            background-color: orange;
+            border: 2px solid black;
+            width: 410px;
+            padding: 5px;
+            cursor: pointer;
+          "
+        >
+          GET A CALL
+        </button>
+      </form>
+      <ul id="userlist" class="users"></ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const form = document.getElementById("myform");
+
+      form.addEventListener("submit", onsubmit);
+
+      function onsubmit(e) {
+        e.preventDefault();
+        let name = e.target.name.value;
+        let email = e.target.email.value;
+        let number = e.target.number.value;
+
+        let obj = {
+          name,
+          email,
+          number,
+        };
+
+        axios
+          .post("http://localhost:4000/users/add", obj)
+          .then((response) => {
+            console.log(response.data);
+            alert("User added successfully");
+          })
+          .catch((e) => console.log(e));
+
+        showUserOnScreen(obj);
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        axios
+          .get("http://localhost:4000/users")
+          .then((response) => {
+            console.log(response.data);
+            response.data.forEach((element) => {
+              showUserOnScreen(element);
+            });
+          })
+          .catch((e) => console.log(e));
+      });
+
+      function showUserOnScreen(obj) {
+        let par = document.getElementById("userlist");
+        let li = document.createElement("li");
+        li.appendChild(document.createTextNode("Name: " + obj.name + " | "));
+        li.appendChild(
+          document.createTextNode("Email id: " + obj.email + " | ")
+        );
+        li.appendChild(
+          document.createTextNode("Contact: " + obj.number + " | ")
+        );
+        let delbtn = document.createElement("button");
+        let br = document.createElement("br");
+        let hr = document.createElement("hr");
+        delbtn.textContent = "Delete";
+
+        delbtn.onclick = () => {
+          par.removeChild(li);
+          axios
+            .delete(`http://localhost:4000/users/delete/${obj.id}`)
+            .then((response) => {
+              console.log(response.data);
+              alert("User deleted");
+            })
+            .catch((e) => console.log(e));
+        };
+
+        let editbtn = document.createElement("input");
+        editbtn.type = "button";
+        editbtn.value = "Edit";
+        editbtn.onclick = () => {
+          par.removeChild(li);
+
+          document.getElementById("name").value = obj.name;
+          document.getElementById("email").value = obj.email;
+          document.getElementById("number").value = obj.number;
+
+          
+        };
+
+        li.appendChild(delbtn);
+        li.appendChild(document.createTextNode(" | "));
+        li.appendChild(editbtn);
+        li.appendChild(br);
+        li.appendChild(hr);
+        par.appendChild(li);
+      }
+    </script>
+  </body>
+</html>
