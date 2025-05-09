@@ -4,6 +4,8 @@ const studentRouter = require("./routes/studentsRoutes");
 const app = express();
 
 const studentModel = require("./models/students")
+const identitycard = require("./models/identitycard")
+const association = require("./models/associations")
 
 app.use(express.json());
 

@@ -1,5 +1,7 @@
 const db = require("../utils/dbConnection");
 const Student = require("../models/students");
+const IdentityCard = require("../models/identitycard");
+const Department = require("../models/department");
 
 const getEntries = async (req, res) => {
     try {
@@ -83,11 +85,40 @@ const deleteEntry = async (req, res) => {
   }
 };
 
+const addingValuesToStudentandIdentityCardTable = async(req,res)=>{
+
+    try {
+        const student =await Student.create(req.body.student);
+        const idCard = await IdentityCard.create({
+            ...req.body.identitycard,
+            studentId: student.id
+        })
+
+        res.status(201).json({student,idCard})
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+const addingValuesToStudentandDepartmentTable = async(req,res)=>{
+
+    try {
+        const department = await Department.create(req.body.department)
+        const student1 =await Student.create({name:"Anil",email:"anil@gmail.com",departmentId:department.id});
+        const student2 =await Student.create({name:"Abhishek",email:"abhishek@gmail.com",departmentId:department.id});
+
+        res.status(201).json({department,student1,student2})
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+
 
 module.exports = {
   getEntries,
   getEntryById,
   addEntries,
   updateEntry,
-  deleteEntry
+  deleteEntry,
+  addingValuesToStudentandIdentityCardTable,
+  addingValuesToStudentandDepartmentTable
 };
