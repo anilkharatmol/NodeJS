@@ -1,10 +1,12 @@
-const Buses = require("../models/busesModel");
-const {Op} = require("sequelize")
+const Booking = require("../models/bookingsModel");
+const Bus = require("../models/busesModel");
+const {Op} = require("sequelize");
+const User = require("../models/usersModel");
 
 const addBus = async (req,res)=>{
     try {
         const {busNumber,totalSeats,availableSeats} = req.body;
-        const newBus = await Buses.create({
+        const newBus = await Bus.create({
             busNumber:busNumber,
             totalSeats:totalSeats,
             availableSeats:availableSeats
@@ -17,11 +19,11 @@ const addBus = async (req,res)=>{
 
 }
 
-const getBusesWithMoreThanSeats =async(req,res)=>{
+const getBusWithMoreThanSeats =async(req,res)=>{
     
     try {
         const {seats} = req.params;
-        const bus = await Buses.findAll({
+        const bus = await Bus.findAll({
             where:{
                 availableSeats:  {
                     [Op.gt] : Number(seats)
@@ -41,4 +43,27 @@ const getBusesWithMoreThanSeats =async(req,res)=>{
 
 }
 
-module.exports ={addBus,getBusesWithMoreThanSeats}
+
+const getBookingByBus = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const booking = await Booking.findAll({
+      where: {
+        BusId: id,
+      },
+    });
+
+    const user = await User.findAll({
+      where: {
+        id: id,
+      },
+    });
+
+    res.status(200).json({booking,user});
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports ={addBus,getBusWithMoreThanSeats,getBookingByBus}
