@@ -28,7 +28,7 @@ const addStudentsToCourses = async(req,res)=>{
 
         await student.addCourse(course) 
 
-        const updatedStudent = await Students.findByPk(studentId,{include:Courses})
+        const updatedStudent = await Students.findByPk(studentId,{include:course})
 
         res.status(201).json(updatedStudent);
 
