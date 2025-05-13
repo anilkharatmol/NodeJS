@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Library System</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      form {
+        margin-bottom: 20px;
+      }
+      .book-entry {
+        border: 1px solid #ccc;
+        background-color: rgb(187, 251, 251);
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      .returned-book-entry {
+        border: 1px solid #ccc;
+        background-color: rgb(195, 240, 132);
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      .fine {
+        color: red;
+        font-weight: bold;
+      }
+      h3 {
+        margin-top: 40px;
+      }
+
+      .books {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Library - Add a Book</h2>
+
+    <form id="bookForm">
+      <label>Book Title: <input type="text" id="bookTitle" required /></label>
+      <button type="submit">Add Book</button>
+    </form>
+
+    <h3>Books Borrowed</h3>
+    <div id="bookList" class="books"></div>
+
+    <h3>Returned Books</h3>
+    <div id="returnedBooks" class="books"></div>
+  </body>
+
+  <script>
+    const book = document.getElementById("bookForm");
+    const bookList = document.getElementById("bookList");
+    const returnedBooksList = document.getElementById("returnedBooks");
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const [response1, response2] = await Promise.all([
+          axios.get("http://localhost:3000/library"),
+          axios.get("http://localhost:3000/library/returnedbooks"),
+        ]);
+
+        const data1 = response1.data;
+        const data2 = response2.data;
+
+        let displayed = false;
+
+        if (Array.isArray(data1) && data1.length > 0) {
+          console.log("Added Books",data1);
+
+          data1.forEach((book) => {
+            displayBooks(book);
+          });
+          displayed = true;
+        }
+
+        if (Array.isArray(data2) && data2.length > 0) {
+          console.log("Returned Books",data2);
+
+          data2.forEach((book) => {
+            displayReturnedBooks(book);
+          });
+          displayed = true;
+        }
+
+        if (!displayed) {
+          throw new Error("No data available");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    book.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        const bookTitle = document.getElementById("bookTitle").value;
+
+        const bookObj = {
+          title: bookTitle,
+        };
+
+        const response = await axios.post(
+          "http://localhost:3000/library/add",
+          bookObj
+        );
+
+        const book = response.data;
+
+        console.log("Book added successfully to the library",book);
+
+        displayBooks(book);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    function displayBooks(book) {
+      const bookDiv = document.createElement("div");
+      bookDiv.className = "book-entry";
+      bookDiv.innerHTML = `
+          <p><strong>Book name:</strong> ${book.title}</p>
+          <p><strong>Book taken on:</strong> ${book.createdAt.toLocaleString()}</p>
+          <p><strong>Book return time:</strong> ${book.returnTime.toLocaleString()}</p>
+          <p><strong>Current fine:</strong> <span class="fine">₹${
+            book.fine
+          }</span></p>
+          <button type="submit" onclick="returnBook(${book.id})"> ${
+        book.fine > 0 ? "Pay Fine and Return Book" : "Return Book"
+      }</button>
+        `;
+
+      bookList.appendChild(bookDiv);
+    }
+
+    async function returnBook(bookId) {
+      try {
+        const response = await axios.post(
+          `http://localhost:3000/library/return/${bookId}`
+        );
+
+        const returnedBook = response.data;
+
+        displayReturnedBooks(returnedBook);
+
+       const deletedBook= await axios.delete(`http://localhost:3000/library/return/${bookId}`);
+       console.log(deletedBook.message);
+        window.location.reload();
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+
+    function displayReturnedBooks(returnedBook) {
+      const retunedBookDiv = document.createElement("div");
+      retunedBookDiv.className = "returned-book-entry";
+      retunedBookDiv.innerHTML = `
+          <p><strong>Book Name:</strong> ${returnedBook.title}</p>
+          <p><strong>Book Returned on:</strong> ${returnedBook.createdAt}</p>
+          <p><strong>Fine paid:</strong> <span class="fine">₹${returnedBook.fine}</span></p>
+        `;
+
+      returnedBooksList.appendChild(retunedBookDiv);
+    }
+  </script>
+</html>
